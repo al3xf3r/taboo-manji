@@ -15,22 +15,18 @@ export default function MenuApp() {
   const [view, setView] = useState<View>("home");
   const [activeCategorySlug, setActiveCategorySlug] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
+  // null = non ancora controllato (blocca render), true = mostra loader, false = skip
+  const [showLoader, setShowLoader] = useState<boolean | null>(null);
 
-  // Check sessionStorage for intro
+  // Controlla sessionStorage una sola volta al mount
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const seen = sessionStorage.getItem("taboo_intro_seen");
-    if (!seen) {
-      setShowLoader(true);
-    }
+    setShowLoader(!seen);
   }, []);
 
   const handleLoaderDone = useCallback(() => {
     setShowLoader(false);
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("taboo_intro_seen", "1");
-    }
+    sessionStorage.setItem("taboo_intro_seen", "1");
   }, []);
 
   const handleSelectCategory = useCallback((slug: string) => {
@@ -64,9 +60,12 @@ export default function MenuApp() {
     }
   }, [view, activeCategorySlug]);
 
+  // Aspetta il check sessionStorage prima di renderizzare qualsiasi cosa
+  if (showLoader === null) return null;
+
   return (
     <>
-      {/* Intro loader (first visit) */}
+      {/* Intro loader (prima visita) */}
       {showLoader && <IntroLoader onDone={handleLoaderDone} />}
 
       {/* Search overlay */}
@@ -81,7 +80,7 @@ export default function MenuApp() {
         />
       )}
 
-      {/* Main layout */}
+      {/* Main layout — nascosto mentre il loader è attivo */}
       <div className={showLoader ? "invisible" : ""}>
         <TopBar
           lang={lang}
