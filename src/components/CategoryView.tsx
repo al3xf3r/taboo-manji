@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import FadeImage from "./FadeImage";
 import {
   MenuCategory,
   MenuItem,
@@ -352,13 +353,14 @@ export default function CategoryView({ category, lang }: CategoryViewProps) {
 function CategoryHero({ category, lang }: { category: MenuCategory; lang: Lang }) {
   return (
     <div className="relative h-40 sm:h-52 overflow-hidden bg-ink/5">
-      <Image
+      <FadeImage
         src={category.image}
         alt={lang === "en" ? category.name_en : category.name_it}
         fill
         sizes="(max-width: 512px) 100vw, 512px"
         className="object-cover"
         priority
+        duration={600}
         onError={(e) => {
           (e.target as HTMLImageElement).parentElement!.style.display = "none";
         }}
