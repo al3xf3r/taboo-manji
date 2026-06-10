@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import FadeImage from "./FadeImage";
 import { categories, restaurantInfo, getCategoryName, Lang } from "@/data/menu";
 
 interface HomeViewProps {
@@ -50,7 +51,9 @@ const facebookIcon = (
 
 const theforkIcon = (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-    <path d="M7 2v5c0 1.1.9 2 2 2v9M11 2v9M13 2v4c0 .55-.45 1-1 1h-1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6 2v4c0 1.1.9 2 2 2v10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    <path d="M6 2v4M8 2v4M10 2v4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    <path d="M14 2c0 0 2 1.5 2 4s-2 3-2 3v9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -61,11 +64,28 @@ export default function HomeView({ lang, onSelectCategory }: HomeViewProps) {
     directions: lang === "it" ? "Indicazioni" : "Directions",
     reserve: lang === "it" ? "Prenota" : "Book",
     poweredBy: lang === "it" ? "Sviluppato da" : "Powered by",
-    manji: lang === "it" ? "Scopri MANJI" : "Explore MANJI",
+    manji: lang === "it" ? "Crea il tuo menù digitale" : "Create your digital menu",
+    orari: lang === "it" ? "Orari" : "Hours",
+    chiuso: lang === "it" ? "Chiuso" : "Closed",
   };
 
+  const orari = [
+    { day: lang === "it" ? "Lunedì" : "Monday",    hours: null },
+    { day: lang === "it" ? "Martedì" : "Tuesday",  hours: "18:00 – 01:00" },
+    { day: lang === "it" ? "Mercoledì" : "Wednesday", hours: "18:00 – 01:00" },
+    { day: lang === "it" ? "Giovedì" : "Thursday", hours: "18:00 – 01:00" },
+    { day: lang === "it" ? "Venerdì" : "Friday",   hours: "18:00 – 02:00" },
+    { day: lang === "it" ? "Sabato" : "Saturday",  hours: "18:00 – 03:00" },
+    { day: lang === "it" ? "Domenica" : "Sunday",  hours: "18:00 – 02:00" },
+  ];
+
+  // Determine today
+  const todayIndex = new Date().getDay(); // 0=Sun, 1=Mon ...
+  const orariIndex = [6, 0, 1, 2, 3, 4, 5]; // map JS day → orari array index
+  const todayOrariIdx = orariIndex[todayIndex];
+
   return (
-    <main className="max-w-lg mx-auto pb-24">
+    <main className="max-w-lg mx-auto">
       {/* Hero strip */}
       <div className="px-4 pt-6 pb-5">
         <h1 className="font-display text-4xl sm:text-5xl font-light tracking-wide text-ink leading-none">
@@ -88,7 +108,7 @@ export default function HomeView({ lang, onSelectCategory }: HomeViewProps) {
               aria-label={getCategoryName(cat, lang)}
             >
               {/* Image */}
-              <Image
+              <FadeImage
                 src={cat.image}
                 alt={getCategoryName(cat, lang)}
                 fill
@@ -142,66 +162,81 @@ export default function HomeView({ lang, onSelectCategory }: HomeViewProps) {
 
       {/* Social links */}
       <section className="px-4 mt-6 flex items-center justify-center gap-4">
-        <a
-          href={info.instagramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+        <a href={info.instagramUrl} target="_blank" rel="noopener noreferrer"
           className="w-10 h-10 flex items-center justify-center text-muted hover:text-accent transition-colors"
-          aria-label="Instagram"
-        >
-          {instagramIcon}
-        </a>
-        <a
-          href={info.facebookUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          aria-label="Instagram">{instagramIcon}</a>
+        <a href={info.facebookUrl} target="_blank" rel="noopener noreferrer"
           className="w-10 h-10 flex items-center justify-center text-muted hover:text-accent transition-colors"
-          aria-label="Facebook"
-        >
-          {facebookIcon}
-        </a>
-        <a
-          href={info.theforkUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          aria-label="Facebook">{facebookIcon}</a>
+        <a href={info.theforkUrl} target="_blank" rel="noopener noreferrer"
           className="w-10 h-10 flex items-center justify-center text-muted hover:text-accent transition-colors"
-          aria-label="TheFork"
-        >
-          {theforkIcon}
-        </a>
+          aria-label="TheFork">{theforkIcon}</a>
       </section>
 
-      {/* Divider */}
-      <div className="mx-4 mt-8 h-px bg-ink/8" />
+      {/* ── RED FOOTER ── */}
+      <footer className="mt-10 bg-accent text-white">
+        {/* Orari */}
+        <div className="px-6 pt-8 pb-6">
+          <p className="font-body text-xs tracking-[0.2em] uppercase text-white/50 mb-4">
+            {labels.orari}
+          </p>
+          <div className="space-y-2">
+            {orari.map((row, i) => {
+              const isToday = i === todayOrariIdx;
+              return (
+                <div
+                  key={row.day}
+                  className={`flex justify-between items-center font-body text-sm ${
+                    isToday ? "text-white font-semibold" : "text-white/70"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    {isToday && (
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-white shrink-0" />
+                    )}
+                    {!isToday && <span className="inline-block w-1.5 h-1.5 shrink-0" />}
+                    {row.day}
+                  </span>
+                  <span>{row.hours ?? labels.chiuso}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-      {/* MANJI CTA */}
-      <div className="px-4 mt-6 flex flex-col items-center gap-3">
-        <a
-          href="https://manji.hash42.xyz"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-accent inline-flex items-center gap-2"
-        >
-          <span>{labels.manji}</span>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </a>
-      </div>
+        {/* Divider */}
+        <div className="mx-6 h-px bg-white/15" />
 
-      {/* Footer credit */}
-      <footer className="mt-8 px-4 pb-6 text-center">
-        <p className="font-body text-xs text-muted/50 tracking-wide">
-          {labels.poweredBy}{" "}
+        {/* MANJI CTA */}
+        <div className="px-6 py-7 flex flex-col items-center gap-5">
           <a
-            href="https://hash42.xyz"
+            href="https://manji.hash42.xyz"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-accent transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-white text-accent font-body font-semibold text-sm tracking-widest uppercase px-6 py-4 transition-all duration-200 hover:bg-white/90 active:scale-95"
           >
-            Hash42
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
+              <path d="M5 7h6M5 10h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+            <span>{labels.manji}</span>
           </a>
-        </p>
+
+          {/* Credit */}
+          <div className="text-center">
+            <p className="font-body text-xs text-white/40 tracking-widest uppercase mb-1">
+              {labels.poweredBy}
+            </p>
+            <a
+              href="https://hash42.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-display text-xl font-medium text-white/80 hover:text-white transition-colors tracking-wide"
+            >
+              Hash42
+            </a>
+          </div>
+        </div>
       </footer>
     </main>
   );
