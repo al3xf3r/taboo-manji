@@ -228,7 +228,7 @@ export default function CategoryView({ category, lang }: CategoryViewProps) {
   }
 
   // ---- DRINKS: grouped by type ----
-  if (slug === "drinks") {
+  if (slug === "drinks-soft" || slug === "drinks-alcohol") {
     const grouped = items.reduce<Record<string, MenuItem[]>>((acc, item) => {
       const key = item.type ?? "other";
       if (!acc[key]) acc[key] = [];
