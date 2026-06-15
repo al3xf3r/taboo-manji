@@ -17,12 +17,12 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Taboo - Bar · Pizzeria · Pub",
+  title: "Taboo | Bar · Pizzeria · Pub",
   description:
     "Scopri il menù completo di Taboo Bar Pizzeria Pub a Francavilla di Sicilia (ME). Pizza, cucina, panini, bevande e molto altro.",
   keywords: ["taboo", "pizzeria", "bar", "pub", "francavilla di sicilia", "menu", "pizza", "sicilia"],
   openGraph: {
-    title: "Taboo - Bar · Pizzeria · Pub",
+    title: "Taboo | Bar · Pizzeria · Pub",
     description:
       "Scopri il menù completo di Taboo a Francavilla di Sicilia. Pizza, cucina, panini, bevande e molto altro.",
     type: "website",
