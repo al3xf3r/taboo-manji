@@ -120,8 +120,11 @@ export default function HomeView({ lang, categories, onSelectCategory }: HomeVie
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
               <div className="card-overlay" />
-              <div className="absolute inset-0 flex items-end p-3">
-                <span className="font-display text-white text-xl sm:text-2xl font-medium leading-tight drop-shadow-sm">
+              <div className="absolute inset-0 flex items-end justify-center p-3">
+                <span
+                  className="font-display text-white text-xl sm:text-2xl font-semibold leading-tight text-center"
+                  style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7), 0 2px 24px rgba(0,0,0,0.5)" }}
+                >
                   {getCategoryName(cat, lang)}
                 </span>
               </div>

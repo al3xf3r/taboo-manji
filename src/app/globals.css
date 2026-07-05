@@ -57,7 +57,7 @@
   }
 
   .category-card:hover .card-overlay {
-    @apply bg-opacity-40;
+    opacity: 1;
   }
 
   .category-card:hover .card-image {
@@ -69,7 +69,14 @@
   }
 
   .card-overlay {
-    @apply absolute inset-0 bg-ink bg-opacity-30 transition-all duration-300;
+    @apply absolute inset-0 transition-all duration-300;
+    background: linear-gradient(
+      to top,
+      rgba(10, 8, 6, 0.82) 0%,
+      rgba(10, 8, 6, 0.45) 40%,
+      rgba(10, 8, 6, 0.10) 70%,
+      rgba(10, 8, 6, 0.0) 100%
+    );
   }
 
   .price-pill {
