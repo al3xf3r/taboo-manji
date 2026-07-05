@@ -107,9 +107,11 @@ export default function HomeView({ lang, categories, onSelectCategory }: HomeVie
           {categories.map((cat) => (
             <button
               key={cat.slug}
-              onClick={() => onSelectCategory(cat.slug)}
+              onClick={() => { if (!cat.unavailable) onSelectCategory(cat.slug); }}
+              disabled={cat.unavailable}
               className="category-card group"
               aria-label={getCategoryName(cat, lang)}
+              style={{ opacity: cat.unavailable ? 0.5 : 1, cursor: cat.unavailable ? "default" : "pointer" }}
             >
               <FadeImage
                 src={cat.image}
@@ -124,6 +126,11 @@ export default function HomeView({ lang, categories, onSelectCategory }: HomeVie
                 <span className="font-display text-white text-xl sm:text-2xl font-medium leading-tight drop-shadow-sm">
                   {getCategoryName(cat, lang)}
                 </span>
+                {cat.unavailable && (
+                  <span style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.7)", color: "#fff", fontSize: "0.65rem", fontWeight: 700, padding: "2px 8px", borderRadius: 20, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                    {lang === "it" ? "Non disponibile" : "Unavailable"}
+                  </span>
+                )}
               </div>
             </button>
           ))}
@@ -142,7 +149,7 @@ export default function HomeView({ lang, categories, onSelectCategory }: HomeVie
             {info.tagline_it}
           </p>
           <p className="font-body text-xs text-white/50 mt-3">
-            {info.address} — {info.city}
+            {info.address}, {info.city}
           </p>
         </div>
 
@@ -198,7 +205,7 @@ export default function HomeView({ lang, categories, onSelectCategory }: HomeVie
               {/* Today's hours preview when closed */}
               {!orariOpen && (
                 <span className="font-body text-xs text-white/70">
-                  — {lang === "it" ? "Oggi" : "Today"}: {todayRow.hours ?? labels.chiuso}
+                 , {lang === "it" ? "Oggi" : "Today"}: {todayRow.hours ?? labels.chiuso}
                 </span>
               )}
             </div>
