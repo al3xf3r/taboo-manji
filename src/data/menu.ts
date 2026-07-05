@@ -22,6 +22,7 @@ export interface MenuItem {
   sizes?: MenuItemSize;
   type?: string;
   badge?: string;
+  available?: boolean;
 }
 
 export interface MenuExtra {
@@ -37,6 +38,7 @@ export interface MenuCategory {
   name_it: string;
   name_en: string;
   image: string;
+  unavailable?: boolean;
   items: MenuItem[];
   extras?: MenuExtra[];
   notes?: string[];

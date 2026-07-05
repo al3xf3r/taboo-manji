@@ -3,10 +3,12 @@
 import Image from "next/image";
 import FadeImage from "./FadeImage";
 import { useState } from "react";
-import { categories, restaurantInfo, getCategoryName, Lang } from "@/data/menu";
+import { restaurantInfo, getCategoryName, Lang } from "@/data/menu";
+import type { MenuCategory } from "@/data/menu";
 
 interface HomeViewProps {
   lang: Lang;
+  categories: MenuCategory[];
   onSelectCategory: (slug: string) => void;
 }
 
@@ -57,7 +59,7 @@ const chevronIcon = (open: boolean) => (
   </svg>
 );
 
-export default function HomeView({ lang, onSelectCategory }: HomeViewProps) {
+export default function HomeView({ lang, categories, onSelectCategory }: HomeViewProps) {
   const info = restaurantInfo;
   const [orariOpen, setOrariOpen] = useState(false);
 

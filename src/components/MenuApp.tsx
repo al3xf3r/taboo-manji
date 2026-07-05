@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { categories, getCategoryName, Lang } from "@/data/menu";
+import { getCategoryName, Lang } from "@/data/menu";
+import type { MenuCategory } from "@/data/menu";
 import IntroLoader from "./IntroLoader";
 import TopBar from "./TopBar";
 import HomeView from "./HomeView";
@@ -10,15 +11,17 @@ import SearchOverlay from "./SearchOverlay";
 
 type View = "home" | "category";
 
-export default function MenuApp() {
+interface MenuAppProps {
+  initialCategories: MenuCategory[];
+}
+
+export default function MenuApp({ initialCategories }: MenuAppProps) {
   const [lang, setLang] = useState<Lang>("it");
   const [view, setView] = useState<View>("home");
   const [activeCategorySlug, setActiveCategorySlug] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  // null = non ancora controllato (blocca render), true = mostra loader, false = skip
   const [showLoader, setShowLoader] = useState<boolean | null>(null);
 
-  // Controlla sessionStorage una sola volta al mount
   useEffect(() => {
     const seen = sessionStorage.getItem("taboo_intro_seen");
     setShowLoader(!seen);
@@ -42,10 +45,9 @@ export default function MenuApp() {
   }, []);
 
   const activeCategory = activeCategorySlug
-    ? categories.find((c) => c.slug === activeCategorySlug) ?? null
+    ? initialCategories.find((c) => c.slug === activeCategorySlug) ?? null
     : null;
 
-  // Browser back button support
   useEffect(() => {
     const handlePopState = () => {
       if (view === "category") handleHome();
@@ -60,18 +62,16 @@ export default function MenuApp() {
     }
   }, [view, activeCategorySlug]);
 
-  // Aspetta il check sessionStorage prima di renderizzare qualsiasi cosa
   if (showLoader === null) return null;
 
   return (
     <>
-      {/* Intro loader (prima visita) */}
       {showLoader && <IntroLoader onDone={handleLoaderDone} />}
 
-      {/* Search overlay */}
       {searchOpen && (
         <SearchOverlay
           lang={lang}
+          categories={initialCategories}
           onClose={() => setSearchOpen(false)}
           onSelectCategory={(slug) => {
             setSearchOpen(false);
@@ -80,7 +80,6 @@ export default function MenuApp() {
         />
       )}
 
-      {/* Main layout — nascosto mentre il loader è attivo */}
       <div className={showLoader ? "invisible" : ""}>
         <TopBar
           lang={lang}
@@ -96,7 +95,11 @@ export default function MenuApp() {
         />
 
         {view === "home" && (
-          <HomeView lang={lang} onSelectCategory={handleSelectCategory} />
+          <HomeView
+            lang={lang}
+            categories={initialCategories}
+            onSelectCategory={handleSelectCategory}
+          />
         )}
 
         {view === "category" && activeCategory && (

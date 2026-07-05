@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  getAllItems,
   getItemName,
   getItemDescription,
   getCategoryName,
@@ -12,6 +11,7 @@ import {
 } from "@/data/menu";
 
 interface SearchOverlayProps {
+  categories: MenuCategory[];
   lang: Lang;
   onClose: () => void;
   onSelectCategory: (slug: string) => void;
@@ -32,10 +32,10 @@ function highlight(text: string, query: string): React.ReactNode {
   );
 }
 
-export default function SearchOverlay({ lang, onClose, onSelectCategory }: SearchOverlayProps) {
+export default function SearchOverlay({ lang, categories, onClose, onSelectCategory }: SearchOverlayProps) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const allItems = getAllItems();
+  const allItems = categories.flatMap(cat => cat.items.map(item => ({ item, category: cat })));
 
   useEffect(() => {
     inputRef.current?.focus();
