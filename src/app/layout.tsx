@@ -16,6 +16,7 @@ const jost = Jost({
   display: "swap",
 });
 
+
 export const metadata: Metadata = {
   title: "Taboo | Bar · Pizzeria · Pub",
   description:
