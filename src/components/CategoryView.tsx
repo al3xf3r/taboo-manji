@@ -19,27 +19,83 @@ function formatPrice(price: number) {
   return `€${price.toFixed(2)}`;
 }
 
+const ALLERGEN_LABELS: Record<string, { it: string; en: string }> = {
+  glutine:             { it: "Glutine",         en: "Gluten"       },
+  latte:               { it: "Latte",           en: "Milk"         },
+  uova:                { it: "Uova",            en: "Eggs"         },
+  pesce:               { it: "Pesce",           en: "Fish"         },
+  molluschi:           { it: "Molluschi",       en: "Molluscs"     },
+  crostacei:           { it: "Crostacei",       en: "Crustaceans"  },
+  frutta_a_guscio:     { it: "Frutta a guscio", en: "Tree nuts"    },
+  sedano:              { it: "Sedano",          en: "Celery"       },
+  soia:                { it: "Soia",            en: "Soy"          },
+  senape:              { it: "Senape",          en: "Mustard"      },
+  sesamo:              { it: "Sesamo",          en: "Sesame"       },
+  lupini:              { it: "Lupini",          en: "Lupin"        },
+  arachidi:            { it: "Arachidi",        en: "Peanuts"      },
+  anidride_solforosa:  { it: "Solfiti",         en: "Sulphites"    },
+};
+
 function ItemCard({ item, lang }: { item: MenuItem; lang: Lang }) {
   const name = getItemName(item, lang);
   const desc = getItemDescription(item, lang);
   const hasDualPrice = !!item.prices;
   const hasSizes = !!item.sizes;
+  const available = (item as any).available !== false;
+  const allergens: string[] = (item as any).allergens ?? [];
 
   return (
-    <div className="py-4 border-b border-ink/6 last:border-0 animate-slide-up">
+    <div className="py-4 border-b border-ink/6 last:border-0 animate-slide-up" style={{ opacity: available ? 1 : 0.45 }}>
       <div className="flex items-start justify-between gap-4">
         {/* Name + description */}
         <div className="min-w-0 flex-1">
           {item.badge && (
             <span className="badge-label block mb-1">{item.badge}</span>
           )}
-          <h3 className="font-display text-xl font-medium leading-tight text-ink">
+          <h3
+            className="font-display text-xl font-medium leading-tight text-ink"
+            style={{ textDecoration: available ? "none" : "line-through" }}
+          >
             {name}
+            {!available && (
+              <span
+                className="font-body text-xs font-normal ml-2"
+                style={{ color: "#9ca3af", textDecoration: "none" }}
+              >
+                {lang === "it" ? "non disponibile" : "unavailable"}
+              </span>
+            )}
           </h3>
           {desc && (
             <p className="font-body text-xs text-muted mt-1 leading-relaxed">
               {desc}
             </p>
+          )}
+          {allergens.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {allergens.map((a) => {
+                const label = ALLERGEN_LABELS[a];
+                if (!label) return null;
+                return (
+                  <span
+                    key={a}
+                    style={{
+                      display: "inline-block",
+                      fontSize: "0.65rem",
+                      fontWeight: 600,
+                      padding: "2px 7px",
+                      borderRadius: 20,
+                      background: "rgba(178,29,29,0.07)",
+                      border: "1px solid rgba(178,29,29,0.18)",
+                      color: "#B21D1D",
+                      letterSpacing: "0.02em",
+                    }}
+                  >
+                    {lang === "it" ? label.it : label.en}
+                  </span>
+                );
+              })}
+            </div>
           )}
         </div>
 
@@ -106,14 +162,14 @@ const sandwichGroups: Record<string, { it: string; en: string }> = {
 // Group kitchen items by badge
 function groupByBadge(items: MenuItem[]): Record<string, MenuItem[]> {
   return items.reduce<Record<string, MenuItem[]>>((acc, item) => {
-    const key = item.badge ?? "—";
+    const key = item.badge ?? "altro";
     if (!acc[key]) acc[key] = [];
     acc[key].push(item);
     return acc;
   }, {});
 }
 
-const badgeOrder = ["Antipasto", "Primo", "Secondo", "Insalata", "—"];
+const badgeOrder = ["Antipasto", "Primo", "Secondo", "Insalata", "altro"];
 const badgeLabels: Record<string, { it: string; en: string }> = {
   Antipasto: { it: "Antipasti", en: "Starters" },
   Primo: { it: "Primi Piatti", en: "First Courses" },
@@ -123,20 +179,20 @@ const badgeLabels: Record<string, { it: string; en: string }> = {
 
 // Group drinks by type
 const drinkGroups: Record<string, { it: string; en: string }> = {
-  coffee: { it: "Caffetteria", en: "Coffee" },
-  soft: { it: "Analcolici", en: "Soft Drinks" },
-  aperitif: { it: "Aperitivi", en: "Aperitifs" },
-  energy: { it: "Energy", en: "Energy" },
-  beer: { it: "Birre in Bottiglia", en: "Bottled Beers" },
-  draft: { it: "Birre alla Spina", en: "Draught Beers" },
-  wine: { it: "Vini", en: "Wines" },
-  sparkling: { it: "Bollicine", en: "Sparkling" },
-  champagne: { it: "Champagne & Spumanti", en: "Champagne & Sparkling" },
+  coffee:    { it: "Caffetteria",          en: "Coffee"              },
+  soft:      { it: "Analcolici",           en: "Soft Drinks"         },
+  aperitif:  { it: "Aperitivi",            en: "Aperitifs"           },
+  energy:    { it: "Energy",               en: "Energy"              },
+  beer:      { it: "Birre in Bottiglia",   en: "Bottled Beers"       },
+  draft:     { it: "Birre alla Spina",     en: "Draught Beers"       },
+  wine:      { it: "Vini",                 en: "Wines"               },
+  sparkling: { it: "Bollicine",            en: "Sparkling"           },
+  champagne: { it: "Champagne & Spumanti", en: "Champagne & Sparkling"},
 };
 
 // Group desserts by type
 const dessertGroups: Record<string, { it: string; en: string }> = {
-  crepe: { it: "Crepes", en: "Crêpes" },
+  crepe:   { it: "Crepes",  en: "Crepes"   },
   dessert: { it: "Dessert", en: "Desserts" },
 };
 
@@ -149,9 +205,7 @@ export default function CategoryView({ category, lang }: CategoryViewProps) {
     const grouped = groupByBadge(items);
     return (
       <main className="max-w-lg mx-auto pb-24 animate-fade-in">
-        {/* Category hero image */}
         <CategoryHero category={category} lang={lang} />
-
         {badgeOrder.map((badge) => {
           const group = grouped[badge];
           if (!group?.length) return null;
@@ -171,7 +225,6 @@ export default function CategoryView({ category, lang }: CategoryViewProps) {
             </section>
           );
         })}
-
         {displayNotes && displayNotes.length > 0 && (
           <div className="px-4 mt-4">
             {displayNotes.map((note, i) => (
@@ -194,17 +247,14 @@ export default function CategoryView({ category, lang }: CategoryViewProps) {
       return acc;
     }, {});
 
-    // items without type → panini/piadine
     const typeOrder = ["toast", "panozzo", "burger", "other"];
 
     return (
       <main className="max-w-lg mx-auto pb-24 animate-fade-in">
         <CategoryHero category={category} lang={lang} />
-
         {typeOrder.map((type) => {
           const group = grouped[type];
           if (!group?.length) return null;
-          // "other" = panini/piadine
           const label =
             type === "other"
               ? { it: "Panini & Piadine", en: "Sandwiches & Flatbreads" }
@@ -304,7 +354,6 @@ export default function CategoryView({ category, lang }: CategoryViewProps) {
         </div>
       </section>
 
-      {/* Pizza extras */}
       {extras && extras.length > 0 && (
         <section className="px-4 mt-8">
           <div className="bg-bg-card border border-ink/8 p-4">
@@ -349,7 +398,6 @@ export default function CategoryView({ category, lang }: CategoryViewProps) {
   );
 }
 
-// Category hero image banner
 function CategoryHero({ category, lang }: { category: MenuCategory; lang: Lang }) {
   return (
     <div className="relative h-40 sm:h-52 overflow-hidden bg-ink/5">
